@@ -1,0 +1,37 @@
+{
+  "name": "browser-test-helpers",
+  "version": "1.0.0",
+  "description": "A small set of generic test helpers for browser interaction tests.",
+  "main": "index.js",
+  "scripts": {
+    "test": "standard",
+    "ci": "zuul --local 9966 -- test/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/shama/browser-test-helpers.git"
+  },
+  "keywords": [
+    "browser",
+    "test",
+    "helpers",
+    "click",
+    "fillIn"
+  ],
+  "author": "Kyle Robinson Young <kyle@dontkry.com> (http://dontkry.com)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/shama/browser-test-helpers/issues"
+  },
+  "homepage": "https://github.com/shama/browser-test-helpers#readme",
+  "devDependencies": {
+    "standard": "^3.7.3",
+    "tap-spec": "^3.0.0",
+    "tape": "^4.0.0",
+    "zuul": "^3.0.0"
+  },
+  "dependencies": {
+    "global": "^4.3.0",
+    "xtend": "^4.0.0"
+  }
+}
