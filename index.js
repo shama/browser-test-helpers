@@ -32,7 +32,19 @@ BrowserTestHelpers.prototype.fillIn = function (el, val) {
 }
 
 BrowserTestHelpers.prototype.triggerEvent = function (el, type, opts) {
-  var ev = new window.CustomEvent(type, opts || {})
+  var ev
+  opts = xtend({
+    bubbles: true,
+    cancelable: true
+  }, opts)
+  if (typeof window.CustomEvent !== 'undefined') {
+    ev = new window.CustomEvent(type, opts || {})
+  } else if (typeof document.createEvent !== 'undefined') {
+    ev = document.createEvent('Event')
+    ev.initEvent(type, opts.bubbles, opts.cancelable)
+  } else {
+    throw new Error('Unable to trigger event, browser not supported.')
+  }
   return el.dispatchEvent(ev)
 }
 
