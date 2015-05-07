@@ -1,6 +1,7 @@
 module.exports = BrowserTestHelpers
 
 var window = require('global/window')
+var document = require('global/document')
 var xtend = require('xtend')
 
 function BrowserTestHelpers () {
@@ -8,11 +9,20 @@ function BrowserTestHelpers () {
 }
 
 BrowserTestHelpers.prototype.click = function (el, opts) {
-  var ev = new window.MouseEvent('click', xtend({
+  var ev
+  opts = xtend({
     bubbles: true,
     cancelable: true,
     view: window
-  }, opts))
+  }, opts)
+  if (typeof window.MouseEvent !== 'undefined') {
+    ev = new window.MouseEvent('click', opts)
+  } else if (typeof document.createEvent !== 'undefined') {
+    ev = document.createEvent('Event')
+    ev.initMouseEvent('click', opts.bubbles, opts.cancelable, opts.view)
+  } else {
+    throw new Error('Unable to simulate click, browser not supported.')
+  }
   return el.dispatchEvent(ev)
 }
 
