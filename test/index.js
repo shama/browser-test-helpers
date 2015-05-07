@@ -10,7 +10,8 @@ test('click', function (t) {
     fixture.appendChild(button)
     button.innerHTML = 'Click Me'
     function clicked (e) {
-      t.equal(e.target.innerHTML, 'Click Me', 'The correct button was clicked')
+      var target = getTarget(e)
+      t.equal(target.innerText, 'Click Me', 'The correct button was clicked')
       tearDown(t.end)
     }
     if (button.addEventListener) {
@@ -41,10 +42,16 @@ test('triggerEvent', function (t) {
     var input = document.createElement('input')
     fixture.appendChild(input)
     input.value = 'Testing'
-    input.addEventListener('focus', function (e) {
-      t.equal(e.target.value, 'Testing', 'The correct input was focused on')
+    function focused (e) {
+      var target = getTarget(e)
+      t.equal(target.value, 'Testing', 'The correct input was focused on')
       tearDown(t.end)
-    }, false)
+    }
+    if (input.addEventListener) {
+      input.addEventListener('focus', focused, false)
+    } else if (input.attachEvent) {
+      input.attachEvent('onfocus', focused)
+    }
     help.triggerEvent(input, 'focus')
   })
 })
@@ -55,11 +62,16 @@ test('keyEvent', function (t) {
   setUp(function (fixture) {
     var input = document.createElement('input')
     fixture.appendChild(input)
-    input.addEventListener('keypress', function (e) {
+    function keypressed (e) {
       t.equal(e.keyCode, 13, 'Received the correct key on keypress')
       t.ok(e.shiftKey, 'shiftKey is true on keypress')
       tearDown(t.end)
-    }, false)
+    }
+    if (input.addEventListener) {
+      input.addEventListener('keypress', keypressed, false)
+    } else if (input.attachEvent) {
+      input.attachEvent('onkeypress', keypressed)
+    }
     help.keyEvent(input, 'keypress', { shiftKey: true, keyCode: 13 })
   })
 })
@@ -75,4 +87,8 @@ function tearDown (cb) {
   var fixture = document.getElementById('fixture')
   document.body.removeChild(fixture)
   cb()
+}
+
+function getTarget (e) {
+  return (e.target) ? e.target : e.srcElement
 }

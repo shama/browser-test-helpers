@@ -44,13 +44,18 @@ BrowserTestHelpers.prototype.triggerEvent = function (el, type, opts) {
   }, opts)
   if (typeof window.CustomEvent !== 'undefined') {
     ev = new window.CustomEvent(type, opts || {})
+    return el.dispatchEvent(ev)
   } else if (typeof document.createEvent !== 'undefined') {
     ev = document.createEvent('Event')
     ev.initEvent(type, opts.bubbles, opts.cancelable)
+    return el.dispatchEvent(ev)
+  } else if (typeof document.createEventObject !== 'undefined') {
+    ev = document.createEventObject()
+    if (opts.bubbles === false) ev.cancelBubble = true
+    el.fireEvent('on' + type, ev)
   } else {
     throw new Error('Unable to trigger event, browser not supported.')
   }
-  return el.dispatchEvent(ev)
 }
 
 BrowserTestHelpers.prototype.keyEvent = function (el, type, opts) {
@@ -71,16 +76,32 @@ BrowserTestHelpers.prototype.keyEvent = function (el, type, opts) {
   }, opts)
   if (!opts.which) opts.which = opts.keyCode
   // Doing this the old fashioned way as its more reliable for now
-  var ev = document.createEvent('KeyboardEvents')
-  ev.initKeyboardEvent(type, opts.bubbles, opts.cancelable, opts.view)
-  var keys = Object.keys(opts)
-  for (var i = 0; i < keys.length; i++) {
-    var k = keys[i]
-    if (opts.hasOwnProperty(k)) {
+  var ev
+  if (typeof document.createEvent !== 'undefined') {
+    ev = document.createEvent('KeyboardEvents')
+    ev.initKeyboardEvent(type, opts.bubbles, opts.cancelable, opts.view)
+    attachProps(opts, function (k, v) {
       Object.defineProperty(ev, k, {
-        get: function () { return opts[k] }
+        get: function () { return v }
       })
+    })
+    return el.dispatchEvent(ev)
+  } else if (typeof document.createEventObject !== 'undefined') {
+    ev = document.createEventObject()
+    if (opts.bubbles === false) ev.cancelBubble = true
+    attachProps(opts, function (k, v) {
+      ev[k] = v
+    })
+    el.fireEvent('on' + type, ev)
+  } else {
+    throw new Error('Unable to trigger keyEvent, browser not supported.')
+  }
+}
+
+function attachProps (props, fn) {
+  for (var k in props) {
+    if (props.hasOwnProperty(k)) {
+      fn(k, props[k])
     }
   }
-  return el.dispatchEvent(ev)
 }
