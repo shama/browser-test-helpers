@@ -17,13 +17,18 @@ BrowserTestHelpers.prototype.click = function (el, opts) {
   }, opts)
   if (typeof window.MouseEvent !== 'undefined') {
     ev = new window.MouseEvent('click', opts)
+    return el.dispatchEvent(ev)
   } else if (typeof document.createEvent !== 'undefined') {
     ev = document.createEvent('Event')
     ev.initMouseEvent('click', opts.bubbles, opts.cancelable, opts.view)
+    return el.dispatchEvent(ev)
+  } else if (typeof document.createEventObject !== 'undefined') {
+    ev = document.createEventObject()
+    if (opts.bubbles === false) ev.cancelBubble = true
+    el.fireEvent('onclick', ev)
   } else {
     throw new Error('Unable to simulate click, browser not supported.')
   }
-  return el.dispatchEvent(ev)
 }
 
 BrowserTestHelpers.prototype.fillIn = function (el, val) {
