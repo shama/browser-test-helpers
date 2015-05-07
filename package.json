@@ -4,8 +4,8 @@
   "description": "A small set of generic test helpers for browser interaction tests.",
   "main": "index.js",
   "scripts": {
-    "test": "standard",
-    "ci": "zuul --local 9966 -- test/index.js"
+    "test": "standard && zuul --local 9966 -- test/index.js",
+    "ci": "standard && zuul -- test/index.js"
   },
   "repository": {
     "type": "git",
