@@ -9,10 +9,15 @@ test('click', function (t) {
     var button = document.createElement('button')
     fixture.appendChild(button)
     button.innerHTML = 'Click Me'
-    button.addEventListener('click', function (e) {
+    function clicked (e) {
       t.equal(e.target.innerHTML, 'Click Me', 'The correct button was clicked')
       tearDown(t.end)
-    }, false)
+    }
+    if (button.addEventListener) {
+      button.addEventListener('click', clicked, false)
+    } else if (button.attachEvent) {
+      button.attachEvent('onclick', clicked)
+    }
     help.click(button)
   })
 })
